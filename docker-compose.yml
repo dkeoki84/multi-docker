@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      - DB_PASSWORD=password
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p $$PORT -b '0.0.0.0'"
+    environment:
+      - PORT=3080
+    ports:
+      - "3080:3080"
+    depends_on:
+      - db
+volumes:
+  mysql-data:
